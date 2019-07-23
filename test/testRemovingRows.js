@@ -1,29 +1,19 @@
-'use strict';
+const Workbook = require('../lib/doc/workbook');
 
-const HrStopwatch = require('./utils/hr-stopwatch');
-const Excel = require('../excel');
+const wb = new Workbook();
+const sheet = wb.addWorksheet('TestSheet');
+sheet.addRows([
+    [1111],
+    [2222],
+    [3333],
+    [4444],
+    [5555],
+]);
 
-const fileIn = process.argv[2];
-const fileOut = process.argv[3];
-const wb = new Excel.Workbook();
-
-const stopwatch = new HrStopwatch();
-stopwatch.start();
-
-wb.xlsx
-  .readFile(fileIn)
-  .then(() => {
-    const micros = stopwatch.microseconds;
-
-    console.log('Loaded', fileIn);
-    console.log('Time taken:', micros / 1000000);
-
-    const sheet = wb.getWorksheet('site_map');
-    // console.log(sheet.rowCount)
-    sheet.spliceRows(2, 3, ['1100']);
-    // console.log(sheet.rowCount)
-    wb.xlsx.writeFile(fileOut);
-  })
-  .catch(error => {
-    console.error('something went wrong', error.stack);
-  });
+console.log('expects 5, got', sheet.rowCount);
+sheet.spliceRows(2, 1);
+console.log('expects 4, got', sheet.rowCount);
+sheet.spliceRows(2, 0, ['+6666'], ['+7777']);
+console.log('expects 6, got', sheet.rowCount);
+sheet.spliceRows(1, sheet.rowCount);
+console.log('expects 0, got', sheet.rowCount);
